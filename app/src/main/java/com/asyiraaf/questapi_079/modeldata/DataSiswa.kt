@@ -22,4 +22,14 @@ data class DetailSiswa(
     val telpon: String = "",
 )
 
+fun DetailSiswa.toSiswa(): DataSiswa = DataSiswa(
+    id = id,
+    nama = nama,
+    alamat = alamat,
+    telpon = telpon
+)
 
+fun DataSiswa.toUiStateSiswa(isEntryValid: Boolean = false): UIStateSiswa = UIStateSiswa(
+    detailSiswa = this.toDetailSiswa(),
+    isEntryValid = isEntryValid
+)
