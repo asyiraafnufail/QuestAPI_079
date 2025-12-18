@@ -1,7 +1,8 @@
-package com.asyiraaf.questapi_079.repositori
-
+import com.asyiraaf.questapi_079.apiservice.ServiceApiSiswa
 import com.asyiraaf.questapi_079.modeldata.DataSiswa
 
-class RepositoryDataSiswa {
-    suspend fun getDatasiswa(): List<DataSiswa> {
+interface RepositoryDataSiswa{
+    suspend fun getSiswa(): List<DataSiswa>
+    suspend fun  postDatasiswa(dataSiswa: DataSiswa): retrofit2.Response<Void>
 }
+
