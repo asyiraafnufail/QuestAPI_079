@@ -1,6 +1,8 @@
 package com.asyiraaf.questapi_079.repositori
 
+import JaringanRepositoryDataSiswa
 import RepositoryDataSiswa
+import com.asyiraaf.questapi_079.apiservice.ServiceApiSiswa
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -34,5 +36,12 @@ class DefaultContainerrApp : ContainerApp{
         )
         .client(klien)
         .build()
+
+    private val retrofitService: ServiceApiSiswa by lazy {
+        retrofit.create(ServiceApiSiswa::class.java)
+    }
+    override val repositoryDataSiswa: RepositoryDataSiswa by lazy {
+        JaringanRepositoryDataSiswa(retrofitService)
+    }
 }
 
