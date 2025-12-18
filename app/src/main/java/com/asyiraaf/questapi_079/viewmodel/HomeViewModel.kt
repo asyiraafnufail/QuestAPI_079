@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asyiraaf.questapi_079.modeldata.DataSiswa
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface StatusUISiswa{
     data class Success(val siswa: List<DataSiswa>) : StatusUISiswa
@@ -30,6 +31,9 @@ class HomeViewModel(private val repositoryDataSiswa: RepositoryDataSiswa) : View
                 StatusUISiswa.Success(repositoryDataSiswa
                     .getDataSiswa())
             }catch (e: Exception){
+                StatusUISiswa.Error
+            }
+            catch (e: HttpException){
                 StatusUISiswa.Error
             }
         }
