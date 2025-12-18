@@ -47,10 +47,10 @@ class DefaultContainerrApp : ContainerApp{
 }
 
 class AplikasiDataSiswa : Application(){
-    lateinit var containerApp: ContainerApp
+    lateinit var container: ContainerApp
     override fun onCreate() {
         super.onCreate()
-        containerApp = DefaultContainerrApp()
+        container = DefaultContainerrApp()
     }
 }
 
