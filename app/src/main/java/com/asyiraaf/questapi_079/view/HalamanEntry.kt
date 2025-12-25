@@ -55,3 +55,11 @@ fun EntrySiswaScreen(
         )
     }
 }
+fun EntrySiswaBody(
+    uiStateSiswa: UiStateSiswa,
+    onSiswaValueChange: (DetailSiswa) -> Unit,
+    onSaveClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+
+}
