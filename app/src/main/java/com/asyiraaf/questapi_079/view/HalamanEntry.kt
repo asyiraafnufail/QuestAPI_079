@@ -6,7 +6,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asyiraaf.questapi_079.uicontroller.route.DestinasiEntry
 import com.asyiraaf.questapi_079.viewmodel.EntryViewModel
 import com.asyiraaf.questapi_079.viewmodel.provider.PenyediaViewModel
 
@@ -30,4 +33,5 @@ fun EntrySiswaScreen(
                 scrollBehavior = scrollBehavior
             )
         }
+    ) { innerPadding ->
 }
