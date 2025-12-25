@@ -1,0 +1,5 @@
+![SS](./ss/home.png)
+![SS](./ss/insert.png)
+![SS](./ss/data.png)
+![SS](./ss/detail.png)
+![SS](./ss/delete.png)
