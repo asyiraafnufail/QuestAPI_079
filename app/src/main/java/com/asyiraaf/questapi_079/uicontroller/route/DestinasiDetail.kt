@@ -1,5 +1,4 @@
 package com.asyiraaf.questapi_079.uicontroller.route
-
 import com.asyiraaf.questapi_079.R
 
 object DestinasiDetail : DestinasiNavigasi {
