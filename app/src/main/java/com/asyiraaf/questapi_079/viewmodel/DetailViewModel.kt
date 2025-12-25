@@ -13,10 +13,11 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-sealed interface DetailUiState {
-    data class Success(val siswa: DataSiswa) : DetailUiState
-    object Error : DetailUiState
-    object Loading : DetailUiState
+// Sesuaikan nama state dengan PDF
+sealed interface StatusUIDetail {
+    data class Success(val satuSiswa: DataSiswa) : StatusUIDetail
+    object Error : StatusUIDetail
+    object Loading : StatusUIDetail
 }
 
 class DetailViewModel(
@@ -26,28 +27,31 @@ class DetailViewModel(
 
     private val _idSiswa: Int = checkNotNull(savedStateHandle[DestinasiDetail.itemIdArg])
 
-    var detailUiState: DetailUiState by mutableStateOf(DetailUiState.Loading)
+    // Gunakan nama variabel sesuai PDF: statusUIDetail
+    var statusUIDetail: StatusUIDetail by mutableStateOf(StatusUIDetail.Loading)
         private set
 
     init {
-        getDetailSiswa()
+        getSatuSiswa()
     }
 
-    fun getDetailSiswa() {
+    // Gunakan nama fungsi sesuai PDF: getSatuSiswa
+    fun getSatuSiswa() {
         viewModelScope.launch {
-            detailUiState = DetailUiState.Loading
-            detailUiState = try {
+            statusUIDetail = StatusUIDetail.Loading
+            statusUIDetail = try {
                 val siswa = repositoryDataSiswa.getSatuSiswa(_idSiswa)
-                DetailUiState.Success(siswa)
+                StatusUIDetail.Success(siswa)
             } catch (e: IOException) {
-                DetailUiState.Error
+                StatusUIDetail.Error
             } catch (e: HttpException) {
-                DetailUiState.Error
+                StatusUIDetail.Error
             }
         }
     }
 
-    suspend fun deleteItem() {
+    // Gunakan nama fungsi sesuai PDF: hapusSatuSiswa
+    suspend fun hapusSatuSiswa() {
         repositoryDataSiswa.hapusSatuSiswa(_idSiswa)
     }
 }
