@@ -2,161 +2,206 @@ package com.asyiraaf.questapi_079.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asyiraaf.questapi_079.R
-import com.asyiraaf.questapi_079.modeldata.DetailSiswa
-import com.asyiraaf.questapi_079.modeldata.UIStateSiswa
-import com.asyiraaf.questapi_079.uicontroller.route.DestinasiEntry
-import com.asyiraaf.questapi_079.viewmodel.EntryViewModel
+import com.asyiraaf.questapi_079.modeldata.DataSiswa
+import com.asyiraaf.questapi_079.uicontroller.route.DestinasiDetail
+import com.asyiraaf.questapi_079.viewmodel.DetailUiState
+import com.asyiraaf.questapi_079.viewmodel.DetailViewModel
 import com.asyiraaf.questapi_079.viewmodel.provider.PenyediaViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EntrySiswaScreen(
+fun DetailSiswaScreen(
+    navigateToEditItem: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EntryViewModel = viewModel(factory = PenyediaViewModel.Factory)
+    viewModel: DetailViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             SiswaTopAppBar(
-                title = stringResource(DestinasiEntry.titleRes),
+                title = stringResource(DestinasiDetail.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateBack,
                 scrollBehavior = scrollBehavior
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    val state = viewModel.detailUiState
+                    if (state is DetailUiState.Success) {
+                        navigateToEditItem(state.siswa.id)
+                    }
+                },
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.edit_siswa)
+                )
+            }
         }
     ) { innerPadding ->
-
-        EntrySiswaBody(
-            uiStateSiswa = viewModel.uiStateSiswa,
-            onSiswaValueChange = viewModel::updateUiState,
-            onSaveClick = {
+        DetailBody(
+            detailUiState = viewModel.detailUiState,
+            retryAction = { viewModel.getDetailSiswa() },
+            onDelete = {
                 coroutineScope.launch {
-                    viewModel.addSiswa()
+                    viewModel.deleteItem()
                     navigateBack()
                 }
             },
             modifier = Modifier
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
         )
     }
 }
 
 @Composable
-fun EntrySiswaBody(
-    uiStateSiswa: UIStateSiswa,
-    onSiswaValueChange: (DetailSiswa) -> Unit,
-    onSaveClick: () -> Unit,
+fun DetailBody(
+    detailUiState: DetailUiState,
+    retryAction: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(
-            dimensionResource(id = R.dimen.padding_large)
-        ),
-        modifier = modifier.padding(
-            dimensionResource(id = R.dimen.padding_medium)
-        )
-    ) {
-        FormTambahSiswa(
-            detailSiswa = uiStateSiswa.detailSiswa,
-            onValueChange = onSiswaValueChange,
-            modifier = Modifier.fillMaxWidth()
-        )
+    when (detailUiState) {
+        is DetailUiState.Loading -> LoadingScreen(modifier = modifier)
+        is DetailUiState.Error -> ErrorScreen(retryAction = retryAction, modifier = modifier)
+        is DetailUiState.Success -> {
+            Column(
+                modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+            ) {
+                ItemDetailSiswa(
+                    siswa = detailUiState.siswa,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        Button(
-            onClick = onSaveClick,
-            enabled = uiStateSiswa.isEntryValid,
-            shape = MaterialTheme.shapes.small,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.btn_submit))
+                var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+                Button(
+                    onClick = { deleteConfirmationRequired = true },
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+
+                if (deleteConfirmationRequired) {
+                    DeleteConfirmationDialog(
+                        onDeleteConfirm = {
+                            deleteConfirmationRequired = false
+                            onDelete()
+                        },
+                        onDeleteCancel = { deleteConfirmationRequired = false }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun FormTambahSiswa(
-    detailSiswa: DetailSiswa,
-    modifier: Modifier = Modifier,
-    onValueChange: (DetailSiswa) -> Unit = {},
-    enabled: Boolean = true
+fun ItemDetailSiswa(
+    siswa: DataSiswa,
+    modifier: Modifier = Modifier
 ) {
-    Column(
+    Card(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(
-            dimensionResource(id = R.dimen.padding_medium)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     ) {
-        OutlinedTextField(
-            value = detailSiswa.nama,
-            onValueChange = { onValueChange(detailSiswa.copy(nama = it)) },
-            label = { Text(stringResource(R.string.nama)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-
-        OutlinedTextField(
-            value = detailSiswa.alamat,
-            onValueChange = { onValueChange(detailSiswa.copy(alamat = it)) },
-            label = { Text(stringResource(R.string.alamat)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-
-        OutlinedTextField(
-            value = detailSiswa.telpon,
-            onValueChange = { onValueChange(detailSiswa.copy(telpon = it)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(text = stringResource(R.string.telpon)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-
-        if (enabled) {
-            Text(
-                text = stringResource(R.string.required_field),
-                modifier = Modifier.padding(
-                    start = dimensionResource(id = R.dimen.padding_medium)
-                )
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(id = R.dimen.padding_medium)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+        ) {
+            ComponentDetailSiswa(judul = stringResource(R.string.nama), isinya = siswa.nama)
+            ComponentDetailSiswa(judul = stringResource(R.string.alamat), isinya = siswa.alamat)
+            ComponentDetailSiswa(judul = stringResource(R.string.telpon), isinya = siswa.telpon)
         }
+    }
+}
 
-        HorizontalDivider(
-            thickness = dimensionResource(R.dimen.padding_small),
-            modifier = Modifier.padding(
-                bottom = dimensionResource(R.dimen.padding_medium)
-            )
+@Composable
+fun ComponentDetailSiswa(
+    judul: String,
+    isinya: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+    ) {
+        Text(
+            text = judul,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = isinya,
+            style = MaterialTheme.typography.bodyMedium
         )
     }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    onDeleteConfirm: () -> Unit,
+    onDeleteCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        onDismissRequest = { /* Do nothing */ },
+        title = { Text(stringResource(R.string.attention)) },
+        text = { Text(stringResource(R.string.tanya)) },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = onDeleteCancel) {
+                Text(stringResource(R.string.no))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDeleteConfirm) {
+                Text(stringResource(R.string.yes))
+            }
+        }
+    )
 }
