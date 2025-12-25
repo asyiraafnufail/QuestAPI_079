@@ -2,7 +2,6 @@ package com.asyiraaf.questapi_079.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -33,8 +32,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asyiraaf.questapi_079.R
 import com.asyiraaf.questapi_079.modeldata.DataSiswa
 import com.asyiraaf.questapi_079.uicontroller.route.DestinasiDetail
-import com.asyiraaf.questapi_079.viewmodel.DetailUiState
 import com.asyiraaf.questapi_079.viewmodel.DetailViewModel
+import com.asyiraaf.questapi_079.viewmodel.StatusUIDetail // Pastikan ini diimport sesuai PDF
 import com.asyiraaf.questapi_079.viewmodel.provider.PenyediaViewModel
 import kotlinx.coroutines.launch
 
@@ -61,9 +60,10 @@ fun DetailSiswaScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    val state = viewModel.detailUiState
-                    if (state is DetailUiState.Success) {
-                        navigateToEditItem(state.siswa.id)
+                    // Perbaikan: Menggunakan statusUIDetail sesuai PDF
+                    val state = viewModel.statusUIDetail
+                    if (state is StatusUIDetail.Success) {
+                        navigateToEditItem(state.satuSiswa.id) // PDF menggunakan satuSiswa
                     }
                 },
                 shape = MaterialTheme.shapes.medium,
@@ -76,12 +76,13 @@ fun DetailSiswaScreen(
             }
         }
     ) { innerPadding ->
+        // Perbaikan: Menggunakan statusUIDetail dan fungsi yang sesuai PDF
         DetailBody(
-            detailUiState = viewModel.detailUiState,
-            retryAction = { viewModel.getDetailSiswa() },
+            detailUiState = viewModel.statusUIDetail,
+            retryAction = { viewModel.getSatuSiswa() }, // PDF: getSatuSiswa
             onDelete = {
                 coroutineScope.launch {
-                    viewModel.deleteItem()
+                    viewModel.hapusSatuSiswa() // PDF: hapusSatuSiswa
                     navigateBack()
                 }
             },
@@ -94,21 +95,22 @@ fun DetailSiswaScreen(
 
 @Composable
 fun DetailBody(
-    detailUiState: DetailUiState,
+    detailUiState: StatusUIDetail, // Tipe data disesuaikan dengan PDF
     retryAction: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (detailUiState) {
-        is DetailUiState.Loading -> LoadingScreen(modifier = modifier)
-        is DetailUiState.Error -> ErrorScreen(retryAction = retryAction, modifier = modifier)
-        is DetailUiState.Success -> {
+        is StatusUIDetail.Loading -> LoadingScreen(modifier = modifier)
+        is StatusUIDetail.Error -> ErrorScreen(retryAction = retryAction, modifier = modifier)
+        is StatusUIDetail.Success -> {
             Column(
                 modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
             ) {
+                // PDF menggunakan variabel 'satuSiswa'
                 ItemDetailSiswa(
-                    siswa = detailUiState.siswa,
+                    siswa = detailUiState.satuSiswa,
                     modifier = Modifier.fillMaxWidth()
                 )
 
