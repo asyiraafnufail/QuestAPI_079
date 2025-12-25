@@ -1,5 +1,6 @@
 package com.asyiraaf.questapi_079.view
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asyiraaf.questapi_079.modeldata.DetailSiswa
+import com.asyiraaf.questapi_079.modeldata.UIStateSiswa
 import com.asyiraaf.questapi_079.uicontroller.route.DestinasiEntry
 import com.asyiraaf.questapi_079.viewmodel.EntryViewModel
 import com.asyiraaf.questapi_079.viewmodel.provider.PenyediaViewModel
@@ -56,10 +59,14 @@ fun EntrySiswaScreen(
     }
 }
 fun EntrySiswaBody(
-    uiStateSiswa: UiStateSiswa,
+    uiStateSiswa: UIStateSiswa,
     onSiswaValueChange: (DetailSiswa) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
-
+    {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(
+                dimensionResource(id = R.dimen.padding_large)
+            ),
 }
