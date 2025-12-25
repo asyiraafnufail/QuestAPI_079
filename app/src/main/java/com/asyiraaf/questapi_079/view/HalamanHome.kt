@@ -55,6 +55,9 @@ fun HomeScreen(
 ) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.loadSiswa()
+    }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
