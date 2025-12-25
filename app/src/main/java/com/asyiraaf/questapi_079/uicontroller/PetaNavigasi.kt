@@ -29,21 +29,61 @@ fun HostNavigasi(
     NavHost(
         navController = navController,
         startDestination = DestinasiHome.route,
-        modifier = Modifier
+        modifier = modifier
     ) {
+
         composable(DestinasiHome.route) {
             HomeScreen(
-                navigateToItemEntry = { navController.navigate(DestinasiEntry.route) },
-                navigateToItemUpdate = {
-                    // Contoh:
-                    // navController.navigate("${DestinasiDetail.route}/${it}")
+                navigateToItemEntry = {
+                    navController.navigate(DestinasiEntry.route)
+                },
+                navigateToItemUpdate = { id ->
+                    navController.navigate("${DestinasiDetail.route}/$id")
                 }
             )
         }
 
         composable(DestinasiEntry.route) {
             EntrySiswaScreen(
-                navigateBack = { navController.navigate(DestinasiHome.route) }
+                navigateBack = {
+                    navController.navigate(DestinasiHome.route)
+                }
+            )
+        }
+
+        composable(
+            route = DestinasiDetail.routeWithArgs,
+            arguments = listOf(
+                navArgument(DestinasiDetail.itemIdArg) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            DetailSiswaScreen(
+                navigateToEditItem = { id ->
+                    navController.navigate("${DestinasiEdit.route}/$id")
+                },
+                navigateBack = {
+                    navController.navigate(DestinasiHome.route)
+                }
+            )
+        }
+
+        composable(
+            route = DestinasiEdit.routeWithArgs,
+            arguments = listOf(
+                navArgument(DestinasiEdit.itemIdArg) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            EditSiswaScreen(
+                navigateBack = {
+                    navController.navigate(DestinasiHome.route)
+                },
+                onNavigateUp = {
+                    navController.navigateUp()
+                }
             )
         }
     }
