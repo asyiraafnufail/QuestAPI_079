@@ -9,9 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asyiraaf.questapi_079.modeldata.DetailSiswa
 import com.asyiraaf.questapi_079.modeldata.UIStateSiswa
+import com.asyiraaf.questapi_079.modeldata.toSiswa
 import com.asyiraaf.questapi_079.modeldata.toUiStateSiswa
 import com.asyiraaf.questapi_079.uicontroller.route.DestinasiDetail
-import com.asyiraaf.questapi_079.modeldata.toDataSiswa
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
@@ -56,7 +56,7 @@ class EditViewModel(
             val call: Response<Void> =
                 repositoryDataSiswa.editSatuSiswa(
                     idSiswa,
-                    uiStateSiswa.detailSiswa.toDataSiswa()
+                    uiStateSiswa.detailSiswa.toSiswa()
                 )
 
             if (call.isSuccessful) {
