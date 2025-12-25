@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asyiraaf.questapi_079.uicontroller.route.DestinasiEntry
 import com.asyiraaf.questapi_079.viewmodel.EntryViewModel
 import com.asyiraaf.questapi_079.viewmodel.provider.PenyediaViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,4 +35,13 @@ fun EntrySiswaScreen(
             )
         }
     ) { innerPadding ->
+        EntrySiswaBody(
+            uiStateSiswa = viewModel.uiStateSiswa,
+            onSiswaValueChange = viewModel::updateUiState,
+            onSaveClick = {
+                coroutineScope.launch {
+                    viewModel.addSiswa()
+                    navigateBack()
+                }
+            },
 }
